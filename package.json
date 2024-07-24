@@ -1,6 +1,10 @@
 {
+  "publisher": "kaynooo",
   "name": "ksymfony",
   "displayName": "KSymfony",
+  "license": "MIT",
+  "version": "0.0.1",
+  "description": "Extension to create query, provider, etc. for Symfony projects",
   "author": {
     "name": "Kayno0o",
     "url": "https://github.com/kayno0o"
@@ -9,17 +13,14 @@
     "type": "git",
     "url": "https://github.com/kayno0o/ksymfony"
   },
-  "description": "Extension to create query, provider, etc. for Symfony projects",
-  "publisher": "kaynooo",
-  "version": "0.0.1",
-  "engines": {
-    "vscode": "^1.89.0"
-  },
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
   "main": "./out/extension.js",
+  "engines": {
+    "vscode": "^1.89.0"
+  },
+  "activationEvents": [],
   "contributes": {
     "commands": [
       {
@@ -38,17 +39,20 @@
     "watch": "tsc -watch -p ./",
     "pretest": "pnpm run compile && pnpm run lint",
     "lint": "eslint src --ext ts",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
-    "@types/vscode": "^1.89.0",
+    "@antfu/eslint-config": "^2.23.2",
     "@types/mocha": "^10.0.6",
     "@types/node": "18.x",
+    "@types/vscode": "^1.89.0",
     "@typescript-eslint/eslint-plugin": "^7.7.1",
     "@typescript-eslint/parser": "^7.7.1",
-    "eslint": "^8.57.0",
-    "typescript": "^5.4.5",
     "@vscode/test-cli": "^0.0.9",
-    "@vscode/test-electron": "^2.3.9"
+    "@vscode/test-electron": "^2.3.9",
+    "eslint": "^9.7.0",
+    "eslint-plugin-github": "^5.0.1",
+    "typescript": "^5.4.5"
   }
 }

@@ -1,4 +1,4 @@
-export type KCommand = {
+export interface KCommand {
+  callback: () => Promise<void> | void
   name: string
-  callback: () => Promise<void>|void
-};
+}

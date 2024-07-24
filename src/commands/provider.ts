@@ -1,50 +1,49 @@
-import * as vscode from 'vscode';
-import * as path from 'path';
-import { KCommand } from "../types";
-import input from '../utils/input';
-import { firstLower } from '../utils/textUtils';
+import * as path from 'node:path'
+import * as vscode from 'vscode'
+import type { KCommand } from '../types'
+import input from '../utils/input'
+import { firstLower } from '../utils/textUtils'
 
 const provider: KCommand = {
-  name: 'provider',
   callback: async () => {
-    const workspaceFolders = vscode.workspace.workspaceFolders;
+    const workspaceFolders = vscode.workspace.workspaceFolders
     if (!workspaceFolders) {
-      vscode.window.showErrorMessage('No workspace folder open');
-      return;
+      vscode.window.showErrorMessage('No workspace folder open')
+      return
     }
 
     const result = await input({
       entityName: {
         prompt: 'Enter the entity name',
-        title: 'Entity Name',
         required: true,
+        title: 'Entity Name',
+      },
+      isCollection: {
+        default: 'true',
+        prompt: 'Is this a collection provider?',
+        required: true,
+        title: 'Is Collection',
+        type: 'boolean',
       },
       providerName: {
         prompt: 'Enter the provider name without the Provider suffix',
-        title: 'Provider Name',
         require: true,
+        title: 'Provider Name',
       },
-      isCollection: {
-        prompt: 'Is this a collection provider?',
-        title: 'Is Collection',
-        type: 'boolean',
-        default: 'true',
-        required: true,
-      },
-    });
+    })
 
     if (result instanceof Error) {
-      return;
+      return
     }
 
-    const { entityName, providerName, isCollection } = result;
+    const { entityName, isCollection, providerName } = result
 
-    const folderPath = workspaceFolders[0].uri.fsPath;
+    const folderPath = workspaceFolders[0].uri.fsPath
 
-    const providerFilePath = path.join(folderPath, 'src/ApiResource/State/', entityName, providerName + 'Provider.php');
-    const providerUri = vscode.Uri.file(providerFilePath);
+    const providerFilePath = path.join(folderPath, 'src/ApiResource/State/', entityName, `${providerName}Provider.php`)
+    const providerUri = vscode.Uri.file(providerFilePath)
 
-    const queryName = `${providerName}${isCollection ? 'Collection' : ''}Query`;
+    const queryName = `${providerName}${isCollection ? 'Collection' : ''}Query`
 
     vscode.workspace.fs.writeFile(providerUri, new TextEncoder().encode(
       `<?php
@@ -76,11 +75,11 @@ class ${providerName} extends AbstractStateProvider
         return $this->getResults(${entityName ?? 'mixed'}::class, new ${queryName}($user), $operation, $context);
     }
 }
-`
-    ));
+`,
+    ))
 
-    const queryFilePath = path.join(folderPath, 'src/Query/', entityName, queryName + '.php');
-    const queryUri = vscode.Uri.file(queryFilePath);
+    const queryFilePath = path.join(folderPath, 'src/Query/', entityName, `${queryName}.php`)
+    const queryUri = vscode.Uri.file(queryFilePath)
 
     vscode.workspace.fs.writeFile(queryUri, new TextEncoder().encode(
       `<?php
@@ -98,10 +97,11 @@ readonly class ${queryName}
     ) {
     }
 }
-`));
+`,
+    ))
 
-    const queryHandlerFilePath = path.join(folderPath, 'src/QueryHandler/', entityName, queryName + 'Handler.php');
-    const queryHandlerUri = vscode.Uri.file(queryHandlerFilePath);
+    const queryHandlerFilePath = path.join(folderPath, 'src/QueryHandler/', entityName, `${queryName}Handler.php`)
+    const queryHandlerUri = vscode.Uri.file(queryHandlerFilePath)
 
     vscode.workspace.fs.writeFile(queryHandlerUri, new TextEncoder().encode(
       `<?php
@@ -130,9 +130,10 @@ class ${queryName}Handler
         return $this->${firstLower(entityName)}Repository->findAll();
     }
 }
-`
-    ));
-  }
-};
+`,
+    ))
+  },
+  name: 'provider',
+}
 
-export default provider;
+export default provider
