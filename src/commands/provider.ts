@@ -39,14 +39,15 @@ const provider: KCommand = {
     let { entityName, isCollection, providerName } = result
 
     providerName += (isCollection ? 'Collection' : '')
+    const queryName = `${providerName}Query`
 
     const folderPath = workspaceFolders[0].uri.fsPath
 
+    // ! PROVIDER
     const providerFilePath = path.join(folderPath, 'src/ApiResource/State/', entityName, `${providerName}Provider.php`)
+    const providerUri = vscode.Uri.file(providerFilePath)
 
-    const queryName = `${providerName}Query`
-
-    vscode.workspace.fs.writeFile(vscode.Uri.file(providerFilePath), new TextEncoder().encode(
+    vscode.workspace.fs.writeFile(providerUri, new TextEncoder().encode(
       `<?php
 
 declare(strict_types=1);
@@ -59,14 +60,14 @@ use App\\Entity\\User;
 use App\\Query${entityName ? `\\${entityName}` : ''}\\${queryName};
 ${entityName ? `use App\\Entity\\${entityName};\n` : ''}
 /**
- * @extends AbstractStateProvider<${entityName ?? 'mixed'}|object>
+ * @extends AbstractStateProvider<${entityName ?? 'mixed'}>
  */
 final readonly class ${providerName}Provider extends AbstractStateProvider
 {
     /**
-     * @return array<${entityName ?? 'mixed'}>|object
+     * @return ${entityName ?? 'mixed'}[]|${entityName ?? 'mixed'}
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object | array
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): ${entityName ?? 'mixed'} | array
     {
         return $this->getResults(${entityName ?? 'mixed'}::class, new ${queryName}($uriVariables), $operation, $context);
     }
@@ -74,6 +75,10 @@ final readonly class ${providerName}Provider extends AbstractStateProvider
 `,
     ))
 
+    const providerDocument = await vscode.workspace.openTextDocument(providerUri)
+    await vscode.window.showTextDocument(providerDocument)
+
+    // ! QUERY
     const queryFilePath = path.join(folderPath, 'src/Query/', entityName, `${queryName}.php`)
     const queryUri = vscode.Uri.file(queryFilePath)
 
@@ -96,9 +101,14 @@ final readonly class ${queryName}
 `,
     ))
 
-    const queryHandlerFilePath = path.join(folderPath, 'src/Query/', entityName, `${queryName}Handler.php`)
+    const queryDocument = await vscode.workspace.openTextDocument(queryUri)
+    await vscode.window.showTextDocument(queryDocument)
 
-    vscode.workspace.fs.writeFile(vscode.Uri.file(queryHandlerFilePath), new TextEncoder().encode(
+    // ! QUERY HANDLER
+    const queryHandlerFilePath = path.join(folderPath, 'src/Query/', entityName, `${queryName}Handler.php`)
+    const queryHandlerUri = vscode.Uri.file(queryHandlerFilePath)
+
+    vscode.workspace.fs.writeFile(queryHandlerUri, new TextEncoder().encode(
       `<?php
 
 declare(strict_types=1);
@@ -128,6 +138,9 @@ final readonly class ${queryName}Handler
 }
 `,
     ))
+
+    const queryHandlerDocument = await vscode.workspace.openTextDocument(queryHandlerUri)
+    await vscode.window.showTextDocument(queryHandlerDocument)
   },
   name: 'provider',
 }
