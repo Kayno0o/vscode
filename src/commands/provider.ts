@@ -62,7 +62,7 @@ ${entityName ? `use App\\Entity\\${entityName};\n` : ''}
 /**
  * @extends AbstractStateProvider<${entityName ?? 'mixed'}>
  */
-final readonly class ${providerName}Provider extends AbstractStateProvider
+final class ${providerName}Provider extends AbstractStateProvider
 {
     /**
      * @return ${entityName ?? 'mixed'}${isCollection ? '[]' : ''}
