@@ -65,9 +65,9 @@ ${entityName ? `use App\\Entity\\${entityName};\n` : ''}
 final readonly class ${providerName}Provider extends AbstractStateProvider
 {
     /**
-     * @return ${entityName ?? 'mixed'}[]|${entityName ?? 'mixed'}
+     * @return ${entityName ?? 'mixed'}${isCollection ? '[]' : ''}
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): ${entityName ?? 'mixed'} | array
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): ${isCollection ? 'array' : 'object'}
     {
         return $this->getResults(${entityName ?? 'mixed'}::class, new ${queryName}($uriVariables), $operation, $context);
     }
