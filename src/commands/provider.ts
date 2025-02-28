@@ -1,6 +1,6 @@
+import type { KCommand } from '../types'
 import * as path from 'node:path'
 import * as vscode from 'vscode'
-import type { KCommand } from '../types'
 import input from '../utils/input'
 import { firstLower } from '../utils/textUtils'
 
@@ -36,16 +36,17 @@ const provider: KCommand = {
       return
     }
 
-    const { entityName, isCollection, providerName } = result
+    let { entityName, isCollection, providerName } = result
+
+    providerName += (isCollection ? 'Collection' : '')
 
     const folderPath = workspaceFolders[0].uri.fsPath
 
     const providerFilePath = path.join(folderPath, 'src/ApiResource/State/', entityName, `${providerName}Provider.php`)
-    const providerUri = vscode.Uri.file(providerFilePath)
 
-    const queryName = `${providerName}${isCollection ? 'Collection' : ''}Query`
+    const queryName = `${providerName}Query`
 
-    vscode.workspace.fs.writeFile(providerUri, new TextEncoder().encode(
+    vscode.workspace.fs.writeFile(vscode.Uri.file(providerFilePath), new TextEncoder().encode(
       `<?php
 
 declare(strict_types=1);
@@ -60,19 +61,14 @@ ${entityName ? `use App\\Entity\\${entityName};\n` : ''}
 /**
  * @extends AbstractStateProvider<${entityName ?? 'mixed'}|object>
  */
-class ${providerName} extends AbstractStateProvider
+final readonly class ${providerName}Provider extends AbstractStateProvider
 {
     /**
      * @return array<${entityName ?? 'mixed'}>|object
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object | array
     {
-        $user = $this->security->getUser();
-        if (!$user instanceof User) {
-            return [];
-        }
-
-        return $this->getResults(${entityName ?? 'mixed'}::class, new ${queryName}($user), $operation, $context);
+        return $this->getResults(${entityName ?? 'mixed'}::class, new ${queryName}($uriVariables), $operation, $context);
     }
 }
 `,
@@ -90,20 +86,19 @@ namespace App\\Query${entityName ? `\\${entityName}` : ''};
 
 use App\\Entity\\User;
 
-readonly class ${queryName}
+final readonly class ${queryName}
 {
     public function __construct(
-        public User $user,
+        public array $uriVariables,
     ) {
     }
 }
 `,
     ))
 
-    const queryHandlerFilePath = path.join(folderPath, 'src/QueryHandler/', entityName, `${queryName}Handler.php`)
-    const queryHandlerUri = vscode.Uri.file(queryHandlerFilePath)
+    const queryHandlerFilePath = path.join(folderPath, 'src/Query/', entityName, `${queryName}Handler.php`)
 
-    vscode.workspace.fs.writeFile(queryHandlerUri, new TextEncoder().encode(
+    vscode.workspace.fs.writeFile(vscode.Uri.file(queryHandlerFilePath), new TextEncoder().encode(
       `<?php
 
 declare(strict_types=1);
@@ -114,7 +109,7 @@ use Doctrine\\ORM\\QueryBuilder;
 use Symfony\\Component\\Messenger\\Attribute\\AsMessageHandler;
 
 #[AsMessageHandler]
-class ${queryName}Handler
+final readonly class ${queryName}Handler
 {
     public function __construct(${entityName ? `\npublic readonly ${entityName}Repository $${firstLower(entityName)}Repository\n` : ''}) {
     }
@@ -126,8 +121,9 @@ class ${queryName}Handler
      */
     public function __invoke(${queryName} $query): QueryBuilder
     {
-        $user = $query->user;
-        return $this->${firstLower(entityName)}Repository->findAll();
+        $uriVariables = $query->uriVariables;
+
+        return $this->${firstLower(entityName)}Repository->createQueryBuilder('${firstLower(entityName)}');
     }
 }
 `,

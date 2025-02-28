@@ -1,6 +1,7 @@
+import type { KCommand } from '../types'
 import * as path from 'node:path'
 import * as vscode from 'vscode'
-import type { KCommand } from '../types'
+import input from '../utils/input'
 
 const processor: KCommand = {
   callback: async () => {
@@ -10,34 +11,29 @@ const processor: KCommand = {
       return
     }
 
-    let entityName: string | undefined
-
-    do {
-      entityName = await vscode.window.showInputBox({
+    const result = await input({
+      entityName: {
         prompt: 'Enter the entity name',
+        required: true,
         title: 'Entity Name',
-      })
-    } while (entityName === '')
-
-    if (entityName === undefined) {
-      return
-    }
-
-    const processorName = await vscode.window.showInputBox({
-      prompt: 'Enter the processor name without the Processor suffix',
-      title: 'Processor Name',
+      },
+      processorName: {
+        prompt: 'Enter the processor name without the Processor suffix',
+        required: true,
+        title: 'Processor Name',
+      },
     })
 
-    if (processorName === undefined) {
+    if (result instanceof Error) {
       return
     }
+
+    const { entityName, processorName } = result
 
     const folderPath = workspaceFolders[0].uri.fsPath
     const filePath = path.join(folderPath, 'src/ApiResource/State/', entityName, `${processorName}Processor.php`)
 
-    const uri = vscode.Uri.file(filePath)
-
-    vscode.workspace.fs.writeFile(uri, new TextEncoder().encode(
+    vscode.workspace.fs.writeFile(vscode.Uri.file(filePath), new TextEncoder().encode(
       `<?php
 
 declare(strict_types=1);
@@ -51,7 +47,7 @@ ${entityName ? `use App\\Entity\\${entityName};\n` : ''}
 /**
  * @extends AbstractStateProcessor<${entityName ?? 'Input'}, ${entityName ?? 'Ouput'}>
  */
-class ${processorName} extends AbstractStateProcessor
+final readonly class ${processorName} extends AbstractStateProcessor
 {
     /**
      * @param ${entityName ?? 'Input'} $data

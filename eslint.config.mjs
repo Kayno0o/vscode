@@ -2,30 +2,12 @@ import antfu from '@antfu/eslint-config'
 import github from 'eslint-plugin-github'
 
 export default antfu({
-  ignorePatterns: [
-    'out',
-    'dist',
-    '**/*.d.ts',
-  ],
-  ignores: [
-    '**/docs/**',
-  ],
   plugins: {
     github,
   },
   rules: {
-    'github/array-foreach': 'error',
-    'github/no-then': 'error',
-    'logical-assignment-operators': ['error', 'always', { enforceForIfStatements: true }],
-    'no-console': 'off',
     'no-empty-function': 'off',
     'node/prefer-global/process': 'off',
-    'operator-assignment': ['error', 'always'],
-    'perfectionist/sort-classes': ['warn', { type: 'natural' }],
-    'perfectionist/sort-enums': ['warn', { type: 'natural' }],
-    'perfectionist/sort-interfaces': ['warn', { type: 'natural' }],
-    'perfectionist/sort-object-types': ['warn', { type: 'natural' }],
-    'perfectionist/sort-objects': ['warn', { type: 'natural' }],
     'style/array-bracket-newline': ['warn', 'consistent'],
     'style/array-element-newline': ['warn', 'consistent'],
     'style/object-curly-newline': ['warn', { consistent: true }],
@@ -44,6 +26,16 @@ export default antfu({
     'ts/prefer-for-of': 'error',
     'ts/prefer-function-type': 'error',
     'ts/prefer-namespace-keyword': 'error',
+    'github/no-then': 'error',
+    'github/array-foreach': 'error',
+    'operator-assignment': ['error', 'always'],
+    'logical-assignment-operators': ['error', 'always', { enforceForIfStatements: true }],
+    'no-else-return': ['error', { allowElseIf: false }],
+    'antfu/no-top-level-await': 'off',
+    'no-console': 'off',
+    'unicorn/no-new-array': 'off',
+    'no-implicit-coercion': ['error', { number: true, boolean: true, string: true, disallowTemplateShorthand: true }],
+    'new-cap': ['error'],
   },
   typescript: true,
 })

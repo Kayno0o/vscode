@@ -25,8 +25,8 @@ export default async function<T extends Options>(options: T): Promise<Result<T> 
 
     const value = await vscode.window.showInputBox({
       prompt: option.prompt,
-      title: option.title + (option.required ? '*' : ''),
-      validateInput: (value) => {
+      // title: option.title + (option.required ? '*' : ''),
+      validateInput: (value: string) => {
         if (option.required && !value) {
           return 'This field is required'
         }
