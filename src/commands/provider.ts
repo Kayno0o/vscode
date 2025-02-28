@@ -47,7 +47,7 @@ const provider: KCommand = {
     const providerFilePath = path.join(folderPath, 'src/ApiResource/State/', entityName, `${providerName}Provider.php`)
     const providerUri = vscode.Uri.file(providerFilePath)
 
-    vscode.workspace.fs.writeFile(providerUri, new TextEncoder().encode(
+    await vscode.workspace.fs.writeFile(providerUri, new TextEncoder().encode(
       `<?php
 
 declare(strict_types=1);
@@ -75,14 +75,13 @@ final class ${providerName}Provider extends AbstractStateProvider
 `,
     ))
 
-    const providerDocument = await vscode.workspace.openTextDocument(providerUri)
-    await vscode.window.showTextDocument(providerDocument)
+    await vscode.window.showTextDocument(providerUri, { preview: false })
 
     // ! QUERY
     const queryFilePath = path.join(folderPath, 'src/Query/', entityName, `${queryName}.php`)
     const queryUri = vscode.Uri.file(queryFilePath)
 
-    vscode.workspace.fs.writeFile(queryUri, new TextEncoder().encode(
+    await vscode.workspace.fs.writeFile(queryUri, new TextEncoder().encode(
       `<?php
 
 declare(strict_types=1);
@@ -101,14 +100,13 @@ final readonly class ${queryName}
 `,
     ))
 
-    const queryDocument = await vscode.workspace.openTextDocument(queryUri)
-    await vscode.window.showTextDocument(queryDocument)
+    await vscode.window.showTextDocument(queryUri, { preview: false })
 
     // ! QUERY HANDLER
     const queryHandlerFilePath = path.join(folderPath, 'src/Query/', entityName, `${queryName}Handler.php`)
     const queryHandlerUri = vscode.Uri.file(queryHandlerFilePath)
 
-    vscode.workspace.fs.writeFile(queryHandlerUri, new TextEncoder().encode(
+    await vscode.workspace.fs.writeFile(queryHandlerUri, new TextEncoder().encode(
       `<?php
 
 declare(strict_types=1);
@@ -121,7 +119,7 @@ use Symfony\\Component\\Messenger\\Attribute\\AsMessageHandler;
 #[AsMessageHandler]
 final readonly class ${queryName}Handler
 {
-    public function __construct(${entityName ? `\npublic readonly ${entityName}Repository $${firstLower(entityName)}Repository\n` : ''}) {
+    public function __construct(${entityName ? `\nprivate ${entityName}Repository $${firstLower(entityName)}Repository\n` : ''}) {
     }
 
     /**
@@ -139,8 +137,7 @@ final readonly class ${queryName}Handler
 `,
     ))
 
-    const queryHandlerDocument = await vscode.workspace.openTextDocument(queryHandlerUri)
-    await vscode.window.showTextDocument(queryHandlerDocument)
+    await vscode.window.showTextDocument(queryHandlerUri, { preview: false })
   },
   name: 'provider',
 }
