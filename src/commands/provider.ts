@@ -28,7 +28,7 @@ export default <KCommand>{
       },
       providerName: {
         prompt: 'Enter the provider name without the Provider suffix',
-        require: true,
+        required: true,
         title: 'Provider Name',
       },
     })
@@ -38,6 +38,8 @@ export default <KCommand>{
     }
 
     let { entityName, isCollection, providerName } = result
+
+    providerName = providerName.replace(isCollection ? /(?:Collection)?Provider$/ : /Provider$/, '')
 
     providerName += (isCollection ? 'Collection' : '')
     const queryName = `${providerName}Query`

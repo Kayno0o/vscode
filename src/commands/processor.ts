@@ -29,7 +29,9 @@ export default <KCommand>{
       return
     }
 
-    const { entityName, processorName } = result
+    let { entityName, processorName } = result
+
+    processorName = processorName.replace(/Processor$/, '')
 
     const folderPath = workspaceFolders[0].uri.fsPath
     const filePath = path.join(folderPath, 'src/ApiResource/State/', entityName, `${processorName}Processor.php`)
