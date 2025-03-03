@@ -34,34 +34,77 @@ export default <KCommand>{
     processorName = processorName.replace(/Processor$/, '')
 
     const folderPath = workspaceFolders[0].uri.fsPath
-    const filePath = path.join(folderPath, 'src/ApiResource/State/', entityName, `${processorName}Processor.php`)
 
+    const commandName = `Process${processorName}Command`
+
+    const filePath = path.join(folderPath, 'src', 'ApiResource', 'State', entityName, `${processorName}Processor.php`)
     await createAndOpenFile(filePath, `<?php
 
 declare(strict_types=1);
 
-namespace App\\ApiResource\\State${entityName ? `\\${entityName}` : ''};
+namespace App\\ApiResource\\State\\${entityName};
 
 use ApiPlatform\\Metadata\\Operation;
 use App\\ApiResource\\State\\AbstractStateProcessor;
 use App\\Entity\\User;
-${entityName ? `use App\\Entity\\${entityName};\n` : ''}
+use App\\Entity\\${entityName};
+use App\\Command\\${entityName}\\${commandName};
+
 /**
- * @extends AbstractStateProcessor<${entityName ?? 'Input'}, ${entityName ?? 'Ouput'}>
+ * @extends AbstractStateProcessor<${entityName}, ${entityName}>
  */
 final class ${processorName}Processor extends AbstractStateProcessor
 {
     /**
-     * @param ${entityName ?? 'Input'} $data
+     * @param ${entityName} $data
      *
-     * @return ${entityName ?? 'Ouput'}
+     * @return ${entityName}
      */
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ${entityName ?? 'Ouput'}
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ${entityName}
     {
-      $this->entityManager->persist($data);
-      $this->entityManager->flush();
+      return $this->executeCommand(new ${commandName}Command($data));
+    }
+}
+`)
 
-      return $data;
+    // create symfony command and command handler
+    const commandFilePath = path.join(folderPath, 'src', 'Command', entityName, `${commandName}.php`)
+    await createAndOpenFile(commandFilePath, `<?php
+
+declare(strict_types=1);
+
+namespace App\\Command\\${entityName};
+
+use App\\Entity\\${entityName};
+
+final readonly class ${commandName}
+{
+    public function __construct(
+        public ${entityName} $data
+    ) {
+    }
+}
+`)
+
+    const commandHandlerFilePath = path.join(folderPath, 'src', 'Command', entityName, `${commandName}Handler.php`)
+    await createAndOpenFile(commandHandlerFilePath, `<?php
+
+declare(strict_types=1);
+
+namespace App\\Command\\${entityName};
+
+use App\\Entity\\${entityName};
+use Symfony\\Component\\Messenger\\Attribute\\AsMessageHandler;
+
+#[AsMessageHandler]
+final readonly class ${commandName}Handler
+{
+    public function __construct(
+    ) {
+    }
+
+    public function __invoke(${commandName} $command): void
+    {
     }
 }
 `)
