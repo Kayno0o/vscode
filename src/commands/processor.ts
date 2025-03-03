@@ -3,7 +3,7 @@ import * as path from 'node:path'
 import * as vscode from 'vscode'
 import input from '../utils/input'
 
-const processor: KCommand = {
+export default <KCommand>{
   callback: async () => {
     const workspaceFolders = vscode.workspace.workspaceFolders
     if (!workspaceFolders) {
@@ -67,5 +67,3 @@ final class ${processorName}Processor extends AbstractStateProcessor
   },
   name: 'processor',
 }
-
-export default processor

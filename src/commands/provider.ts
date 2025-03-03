@@ -4,7 +4,7 @@ import * as vscode from 'vscode'
 import input from '../utils/input'
 import { firstLower } from '../utils/textUtils'
 
-const provider: KCommand = {
+export default <KCommand>{
   callback: async () => {
     const workspaceFolders = vscode.workspace.workspaceFolders
     if (!workspaceFolders) {
@@ -141,5 +141,3 @@ final readonly class ${queryName}Handler
   },
   name: 'provider',
 }
-
-export default provider
