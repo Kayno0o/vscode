@@ -47,7 +47,7 @@ ${entityName ? `use App\\Entity\\${entityName};\n` : ''}
 /**
  * @extends AbstractStateProcessor<${entityName ?? 'Input'}, ${entityName ?? 'Ouput'}>
  */
-final readonly class ${processorName} extends AbstractStateProcessor
+final class ${processorName}Processor extends AbstractStateProcessor
 {
     /**
      * @param ${entityName ?? 'Input'} $data
@@ -56,13 +56,8 @@ final readonly class ${processorName} extends AbstractStateProcessor
      */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ${entityName ?? 'Ouput'}
     {
-      $user = $this->security->getUser();
-      if (!($user instanceof User)) {
-          throw new AccessDeniedHttpException('Access denied');
-      }
-
-      $this->manager->persist($data);
-      $this->manager->flush();
+      $this->entityManager->persist($data);
+      $this->entityManager->flush();
 
       return $data;
     }
