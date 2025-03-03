@@ -1,6 +1,7 @@
 import type { KCommand } from '../types'
 import * as path from 'node:path'
 import * as vscode from 'vscode'
+import { createAndOpenFile } from '../utils/file'
 import input from '../utils/input'
 
 export default <KCommand>{
@@ -33,8 +34,7 @@ export default <KCommand>{
     const folderPath = workspaceFolders[0].uri.fsPath
     const filePath = path.join(folderPath, 'src/ApiResource/State/', entityName, `${processorName}Processor.php`)
 
-    vscode.workspace.fs.writeFile(vscode.Uri.file(filePath), new TextEncoder().encode(
-      `<?php
+    await createAndOpenFile(filePath, `<?php
 
 declare(strict_types=1);
 
@@ -62,8 +62,7 @@ final class ${processorName}Processor extends AbstractStateProcessor
       return $data;
     }
 }
-`,
-    ))
+`)
   },
   name: 'processor',
 }

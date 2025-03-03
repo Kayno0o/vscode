@@ -1,6 +1,7 @@
 import type { KCommand } from '../types'
 import * as path from 'node:path'
 import * as vscode from 'vscode'
+import { createAndOpenFile } from '../utils/file'
 import input from '../utils/input'
 import { firstLower } from '../utils/textUtils'
 
@@ -45,10 +46,7 @@ export default <KCommand>{
 
     // ! PROVIDER
     const providerFilePath = path.join(folderPath, 'src/ApiResource/State/', entityName, `${providerName}Provider.php`)
-    const providerUri = vscode.Uri.file(providerFilePath)
-
-    await vscode.workspace.fs.writeFile(providerUri, new TextEncoder().encode(
-      `<?php
+    await createAndOpenFile(providerFilePath, `<?php
 
 declare(strict_types=1);
 
@@ -72,17 +70,11 @@ final class ${providerName}Provider extends AbstractStateProvider
         return $this->getResults(${entityName ?? 'mixed'}::class, new ${queryName}($uriVariables), $operation, $context);
     }
 }
-`,
-    ))
-
-    await vscode.window.showTextDocument(providerUri, { preview: false })
+`)
 
     // ! QUERY
     const queryFilePath = path.join(folderPath, 'src/Query/', entityName, `${queryName}.php`)
-    const queryUri = vscode.Uri.file(queryFilePath)
-
-    await vscode.workspace.fs.writeFile(queryUri, new TextEncoder().encode(
-      `<?php
+    await createAndOpenFile(queryFilePath, `<?php
 
 declare(strict_types=1);
 
@@ -97,17 +89,11 @@ final readonly class ${queryName}
     ) {
     }
 }
-`,
-    ))
-
-    await vscode.window.showTextDocument(queryUri, { preview: false })
+`)
 
     // ! QUERY HANDLER
     const queryHandlerFilePath = path.join(folderPath, 'src/Query/', entityName, `${queryName}Handler.php`)
-    const queryHandlerUri = vscode.Uri.file(queryHandlerFilePath)
-
-    await vscode.workspace.fs.writeFile(queryHandlerUri, new TextEncoder().encode(
-      `<?php
+    await createAndOpenFile(queryHandlerFilePath, `<?php
 
 declare(strict_types=1);
 
@@ -134,10 +120,7 @@ final readonly class ${queryName}Handler
         return $this->${firstLower(entityName)}Repository->createQueryBuilder('${firstLower(entityName)}');
     }
 }
-`,
-    ))
-
-    await vscode.window.showTextDocument(queryHandlerUri, { preview: false })
+`)
   },
   name: 'provider',
 }
