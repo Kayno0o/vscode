@@ -62,7 +62,7 @@ final class ${processorName}Processor extends AbstractStateProcessor
      */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ${entityName}
     {
-      return $this->executeCommand(new ${commandName}($data));
+      return $this->executeCommand(new ${commandName}(data: $data, uriVariables: $uriVariables));
     }
 }
 `)
@@ -80,7 +80,8 @@ use App\\Entity\\${entityName};
 final readonly class ${commandName}
 {
     public function __construct(
-        public ${entityName} $data
+        public ${entityName} $data,
+        public array $uriVariables,
     ) {
     }
 }
