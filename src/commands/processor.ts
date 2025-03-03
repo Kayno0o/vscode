@@ -62,7 +62,7 @@ final class ${processorName}Processor extends AbstractStateProcessor
      */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ${entityName}
     {
-      return $this->executeCommand(new ${commandName}Command($data));
+      return $this->executeCommand(new ${commandName}($data));
     }
 }
 `)
