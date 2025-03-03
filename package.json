@@ -35,8 +35,7 @@
   },
   "scripts": {
     "vscode:prepublish": "nr compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "compile": "bun x tsup",
     "pretest": "nr compile && nr lint",
     "lint": "eslint src --ext ts",
     "test": "vscode-test",
@@ -56,6 +55,7 @@
     "@vscode/test-electron": "^2.4.1",
     "eslint": "^9.21.0",
     "eslint-plugin-github": "^5.1.8",
+    "tsup": "^8.4.0",
     "vscode": "^1.1.37"
   }
 }

@@ -47,40 +47,41 @@ export default <KCommand>{
     const folderPath = workspaceFolders[0].uri.fsPath
 
     // ! PROVIDER
-    const providerFilePath = path.join(folderPath, 'src/ApiResource/State/', entityName, `${providerName}Provider.php`)
+    const providerFilePath = path.join(folderPath, 'src', 'ApiResource', 'State', entityName, `${providerName}Provider.php`)
     await createAndOpenFile(providerFilePath, `<?php
 
 declare(strict_types=1);
 
-namespace App\\ApiResource\\State${entityName ? `\\${entityName}` : ''};
+namespace App\\ApiResource\\State\\${entityName};
 
 use ApiPlatform\\Metadata\\Operation;
 use App\\ApiResource\\State\\AbstractStateProvider;
 use App\\Entity\\User;
-use App\\Query${entityName ? `\\${entityName}` : ''}\\${queryName};
-${entityName ? `use App\\Entity\\${entityName};\n` : ''}
+use App\\Query\\${entityName}\\${queryName};
+use App\\Entity\\${entityName};
+
 /**
- * @extends AbstractStateProvider<${entityName ?? 'mixed'}>
+ * @extends AbstractStateProvider<${entityName}>
  */
 final class ${providerName}Provider extends AbstractStateProvider
 {
     /**
-     * @return ${entityName ?? 'mixed'}${isCollection ? '[]' : ''}
+     * @return ${entityName}${isCollection ? '[]' : ''}
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ${isCollection ? 'array' : 'object'}
     {
-        return $this->getResults(${entityName ?? 'mixed'}::class, new ${queryName}($uriVariables), $operation, $context);
+        return $this->getResults(${entityName}::class, new ${queryName}($uriVariables), $operation, $context);
     }
 }
 `)
 
     // ! QUERY
-    const queryFilePath = path.join(folderPath, 'src/Query/', entityName, `${queryName}.php`)
+    const queryFilePath = path.join(folderPath, 'src', 'Query', entityName, `${queryName}.php`)
     await createAndOpenFile(queryFilePath, `<?php
 
 declare(strict_types=1);
 
-namespace App\\Query${entityName ? `\\${entityName}` : ''};
+namespace App\\Query\\${entityName};
 
 use App\\Entity\\User;
 
@@ -94,20 +95,23 @@ final readonly class ${queryName}
 `)
 
     // ! QUERY HANDLER
-    const queryHandlerFilePath = path.join(folderPath, 'src/Query/', entityName, `${queryName}Handler.php`)
+    const queryHandlerFilePath = path.join(folderPath, 'src', 'Query', entityName, `${queryName}Handler.php`)
     await createAndOpenFile(queryHandlerFilePath, `<?php
 
 declare(strict_types=1);
 
-namespace App\\Query${entityName ? `\\${entityName}` : ''};
-${entityName ? `\nuse App\\Repository\\${entityName}Repository;` : ''}
+namespace App\\Query\\${entityName};
+
+use App\\Repository\\${entityName}Repository;
 use Doctrine\\ORM\\QueryBuilder;
 use Symfony\\Component\\Messenger\\Attribute\\AsMessageHandler;
 
 #[AsMessageHandler]
 final readonly class ${queryName}Handler
 {
-    public function __construct(${entityName ? `\nprivate ${entityName}Repository $${firstLower(entityName)}Repository\n` : ''}) {
+    public function __construct(
+        private ${entityName}Repository $${firstLower(entityName)}Repository,
+    ) {
     }
 
     /**

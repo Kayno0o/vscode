@@ -1,11 +1,15 @@
-.vscode/**
-.vscode-test/**
+node_modules/**
 src/**
+tests/**
+
+# Ignore TypeScript outputs
+tsconfig.tsbuildinfo
+tsconfig.json
+tsup.config.ts
+
+# Ignore development files
+.vscode/**
+.git/**
 .gitignore
-.yarnrc
-vsc-extension-quickstart.md
-**/tsconfig.json
-**/.eslintrc.json
-**/*.map
-**/*.ts
-**/.vscode-test.*
+README.md
+package-lock.json
