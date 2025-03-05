@@ -1,7 +1,7 @@
 import type { KCommand } from '../types'
 import * as path from 'node:path'
 import * as vscode from 'vscode'
-import { createAndOpenPhpFile } from '../utils/file'
+import { createAndOpenPhpFile, getMessagePath, getStatePath } from '../utils/file'
 import input from '../utils/input'
 import { firstLower } from '../utils/textUtils'
 
@@ -47,11 +47,7 @@ export default <KCommand>{
     const folderPath = workspaceFolders[0].uri.fsPath
 
     // ! PROVIDER
-    // check if path src/ApiResource/State exists, if not, use path src/State
-    let statePath = path.join(folderPath, 'src', 'ApiResource', 'State')
-    // eslint-disable-next-line github/no-then
-    await vscode.workspace.fs.stat(vscode.Uri.file(statePath)).then(() => null, () => statePath = path.join(folderPath, 'src', 'State'))
-
+    const statePath = await getStatePath(folderPath)
     const providerFilePath = path.join(statePath, entityName, `${providerName}Provider.php`)
     await createAndOpenPhpFile(providerFilePath, `
 use ApiPlatform\\Metadata\\Operation;
@@ -74,8 +70,10 @@ final class ${providerName}Provider extends AbstractStateProvider
     }
 }`)
 
+    const messagePath = await getMessagePath(folderPath)
+
     // ! QUERY
-    const queryFilePath = path.join(folderPath, 'src', 'Query', entityName, `${queryName}.php`)
+    const queryFilePath = path.join(messagePath, 'Query', entityName, `${queryName}.php`)
     await createAndOpenPhpFile(queryFilePath, `
 use App\\Entity\\User;
 
@@ -89,7 +87,7 @@ final readonly class ${queryName}
 `)
 
     // ! QUERY HANDLER
-    const queryHandlerFilePath = path.join(folderPath, 'src', 'Query', entityName, `${queryName}Handler.php`)
+    const queryHandlerFilePath = path.join(messagePath, 'Query', entityName, `${queryName}Handler.php`)
     await createAndOpenPhpFile(queryHandlerFilePath, `
 use App\\Repository\\${entityName}Repository;
 use Doctrine\\ORM\\QueryBuilder;

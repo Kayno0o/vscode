@@ -1,7 +1,7 @@
 import type { KCommand } from '../types'
 import * as path from 'node:path'
 import * as vscode from 'vscode'
-import { createAndOpenPhpFile } from '../utils/file'
+import { createAndOpenPhpFile, getMessagePath, getStatePath } from '../utils/file'
 import input from '../utils/input'
 
 export default <KCommand>{
@@ -37,13 +37,10 @@ export default <KCommand>{
 
     const commandName = `Process${processorName}Command`
 
-    // check if path src/ApiResource/State exists, if not, use path src/State
-    let statePath = path.join(folderPath, 'src', 'ApiResource', 'State')
-    // eslint-disable-next-line github/no-then
-    await vscode.workspace.fs.stat(vscode.Uri.file(statePath)).then(() => null, () => statePath = path.join(folderPath, 'src', 'State'))
+    const statePath = await getStatePath(folderPath)
 
-    const filePath = path.join(statePath, entityName, `${processorName}Processor.php`)
-    await createAndOpenPhpFile(filePath, `
+    // ! PROCESSOR
+    await createAndOpenPhpFile(path.join(statePath, entityName, `${processorName}Processor.php`), `
 use ApiPlatform\\Metadata\\Operation;
 use App\\ApiResource\\State\\AbstractStateProcessor;
 use App\\Entity\\User;
@@ -67,9 +64,10 @@ final class ${processorName}Processor extends AbstractStateProcessor
 }
 `)
 
-    // create symfony command and command handler
-    const commandFilePath = path.join(folderPath, 'src', 'Command', entityName, `${commandName}.php`)
-    await createAndOpenPhpFile(commandFilePath, `
+    const messagePath = await getMessagePath(folderPath)
+
+    // ! COMMAND
+    await createAndOpenPhpFile(path.join(messagePath, 'Command', entityName, `${commandName}.php`), `
 use App\\Entity\\${entityName};
 
 final readonly class ${commandName}
@@ -82,8 +80,8 @@ final readonly class ${commandName}
 }
 `)
 
-    const commandHandlerFilePath = path.join(folderPath, 'src', 'Command', entityName, `${commandName}Handler.php`)
-    await createAndOpenPhpFile(commandHandlerFilePath, `
+    // ! COMMAND HANDLER
+    await createAndOpenPhpFile(path.join(messagePath, 'Command', entityName, `${commandName}Handler.php`), `
 use App\\Entity\\${entityName};
 use Symfony\\Component\\Messenger\\Attribute\\AsMessageHandler;
 
