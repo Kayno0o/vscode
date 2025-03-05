@@ -37,7 +37,12 @@ export default <KCommand>{
 
     const commandName = `Process${processorName}Command`
 
-    const filePath = path.join(folderPath, 'src', 'ApiResource', 'State', entityName, `${processorName}Processor.php`)
+    // check if path src/ApiResource/State exists, if not, use path src/State
+    let statePath = path.join(folderPath, 'src', 'ApiResource', 'State')
+    // eslint-disable-next-line github/no-then
+    await vscode.workspace.fs.stat(vscode.Uri.file(statePath)).then(() => null, () => statePath = path.join(folderPath, 'src', 'State'))
+
+    const filePath = path.join(statePath, entityName, `${processorName}Processor.php`)
     await createAndOpenFile(filePath, `<?php
 
 declare(strict_types=1);

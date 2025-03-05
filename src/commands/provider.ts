@@ -47,7 +47,12 @@ export default <KCommand>{
     const folderPath = workspaceFolders[0].uri.fsPath
 
     // ! PROVIDER
-    const providerFilePath = path.join(folderPath, 'src', 'ApiResource', 'State', entityName, `${providerName}Provider.php`)
+    // check if path src/ApiResource/State exists, if not, use path src/State
+    let statePath = path.join(folderPath, 'src', 'ApiResource', 'State')
+    // eslint-disable-next-line github/no-then
+    await vscode.workspace.fs.stat(vscode.Uri.file(statePath)).then(() => null, () => statePath = path.join(folderPath, 'src', 'State'))
+
+    const providerFilePath = path.join(statePath, entityName, `${providerName}Provider.php`)
     await createAndOpenFile(providerFilePath, `<?php
 
 declare(strict_types=1);
