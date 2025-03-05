@@ -1,7 +1,7 @@
 import type { KCommand } from '../types'
 import * as path from 'node:path'
 import * as vscode from 'vscode'
-import { createAndOpenFile } from '../utils/file'
+import { createAndOpenPhpFile } from '../utils/file'
 import input from '../utils/input'
 
 export default <KCommand>{
@@ -43,12 +43,7 @@ export default <KCommand>{
     await vscode.workspace.fs.stat(vscode.Uri.file(statePath)).then(() => null, () => statePath = path.join(folderPath, 'src', 'State'))
 
     const filePath = path.join(statePath, entityName, `${processorName}Processor.php`)
-    await createAndOpenFile(filePath, `<?php
-
-declare(strict_types=1);
-
-namespace App\\ApiResource\\State\\${entityName};
-
+    await createAndOpenPhpFile(filePath, `
 use ApiPlatform\\Metadata\\Operation;
 use App\\ApiResource\\State\\AbstractStateProcessor;
 use App\\Entity\\User;
@@ -74,12 +69,7 @@ final class ${processorName}Processor extends AbstractStateProcessor
 
     // create symfony command and command handler
     const commandFilePath = path.join(folderPath, 'src', 'Command', entityName, `${commandName}.php`)
-    await createAndOpenFile(commandFilePath, `<?php
-
-declare(strict_types=1);
-
-namespace App\\Command\\${entityName};
-
+    await createAndOpenPhpFile(commandFilePath, `
 use App\\Entity\\${entityName};
 
 final readonly class ${commandName}
@@ -93,12 +83,7 @@ final readonly class ${commandName}
 `)
 
     const commandHandlerFilePath = path.join(folderPath, 'src', 'Command', entityName, `${commandName}Handler.php`)
-    await createAndOpenFile(commandHandlerFilePath, `<?php
-
-declare(strict_types=1);
-
-namespace App\\Command\\${entityName};
-
+    await createAndOpenPhpFile(commandHandlerFilePath, `
 use App\\Entity\\${entityName};
 use Symfony\\Component\\Messenger\\Attribute\\AsMessageHandler;
 

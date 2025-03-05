@@ -1,7 +1,7 @@
 import type { KCommand } from '../types'
 import * as path from 'node:path'
 import * as vscode from 'vscode'
-import { createAndOpenFile } from '../utils/file'
+import { createAndOpenPhpFile } from '../utils/file'
 import input from '../utils/input'
 import { firstLower } from '../utils/textUtils'
 
@@ -53,12 +53,7 @@ export default <KCommand>{
     await vscode.workspace.fs.stat(vscode.Uri.file(statePath)).then(() => null, () => statePath = path.join(folderPath, 'src', 'State'))
 
     const providerFilePath = path.join(statePath, entityName, `${providerName}Provider.php`)
-    await createAndOpenFile(providerFilePath, `<?php
-
-declare(strict_types=1);
-
-namespace App\\ApiResource\\State\\${entityName};
-
+    await createAndOpenPhpFile(providerFilePath, `
 use ApiPlatform\\Metadata\\Operation;
 use App\\ApiResource\\State\\AbstractStateProvider;
 use App\\Entity\\User;
@@ -77,17 +72,11 @@ final class ${providerName}Provider extends AbstractStateProvider
     {
         return $this->getResults(${entityName}::class, new ${queryName}($uriVariables), $operation, $context);
     }
-}
-`)
+}`)
 
     // ! QUERY
     const queryFilePath = path.join(folderPath, 'src', 'Query', entityName, `${queryName}.php`)
-    await createAndOpenFile(queryFilePath, `<?php
-
-declare(strict_types=1);
-
-namespace App\\Query\\${entityName};
-
+    await createAndOpenPhpFile(queryFilePath, `
 use App\\Entity\\User;
 
 final readonly class ${queryName}
@@ -101,12 +90,7 @@ final readonly class ${queryName}
 
     // ! QUERY HANDLER
     const queryHandlerFilePath = path.join(folderPath, 'src', 'Query', entityName, `${queryName}Handler.php`)
-    await createAndOpenFile(queryHandlerFilePath, `<?php
-
-declare(strict_types=1);
-
-namespace App\\Query\\${entityName};
-
+    await createAndOpenPhpFile(queryHandlerFilePath, `
 use App\\Repository\\${entityName}Repository;
 use Doctrine\\ORM\\QueryBuilder;
 use Symfony\\Component\\Messenger\\Attribute\\AsMessageHandler;
