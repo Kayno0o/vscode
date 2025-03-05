@@ -36,7 +36,7 @@ export default <KCommand>{
 
     const folderPath = workspaceFolders[0].uri.fsPath
 
-    const commandName = `Process${processorName}Command`
+    const commandName = `${processorName}Command`
 
     const statePath = await getStatePath(folderPath)
     const messagePath = await getMessagePath(folderPath)
