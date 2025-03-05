@@ -20,11 +20,26 @@ ${content.trim()}
   await createAndOpenFile(filePath, content)
 }
 
+async function folderExists(folderUri: vscode.Uri): Promise<boolean> {
+  try {
+    const stats = await vscode.workspace.fs.stat(folderUri)
+    vscode.window.showErrorMessage(`Folder exists: ${folderUri.fsPath}, isDirectory: ${stats.type}`)
+    return true
+  }
+  catch {
+    vscode.window.showErrorMessage(`Folder does not exist: ${folderUri.fsPath}`)
+    return false
+  }
+}
+
 // ewither src/ApiResource/State exists, or src/State
 export async function getStatePath(folderPath: string) {
   let statePath = path.join(folderPath, 'src', 'ApiResource', 'State')
-  // eslint-disable-next-line github/no-then
-  await vscode.workspace.fs.stat(vscode.Uri.file(statePath)).then(() => null, () => statePath = path.join(folderPath, 'src', 'State'))
+
+  const folderExist = await folderExists(vscode.Uri.file(statePath))
+
+  if (!folderExist)
+    statePath = path.join(folderPath, 'src', 'State')
 
   return statePath
 }
@@ -32,8 +47,11 @@ export async function getStatePath(folderPath: string) {
 // either src/Message, or src
 export async function getMessagePath(folderPath: string) {
   let messagesPath = path.join(folderPath, 'src', 'Message')
-  // eslint-disable-next-line github/no-then
-  await vscode.workspace.fs.stat(vscode.Uri.file(messagesPath)).then(() => null, () => messagesPath = path.join(folderPath, 'src'))
+
+  const folderExist = await folderExists(vscode.Uri.file(messagesPath))
+
+  if (!folderExist)
+    messagesPath = path.join(folderPath, 'src')
 
   return messagesPath
 }

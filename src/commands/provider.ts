@@ -3,7 +3,7 @@ import * as path from 'node:path'
 import * as vscode from 'vscode'
 import { createAndOpenPhpFile, getMessagePath, getStatePath } from '../utils/file'
 import input from '../utils/input'
-import { firstLower } from '../utils/textUtils'
+import { firstLower, pathToUse } from '../utils/textUtils'
 
 export default <KCommand>{
   callback: async () => {
@@ -46,14 +46,19 @@ export default <KCommand>{
 
     const folderPath = workspaceFolders[0].uri.fsPath
 
-    // ! PROVIDER
     const statePath = await getStatePath(folderPath)
+    const messagePath = await getMessagePath(folderPath)
+
     const providerFilePath = path.join(statePath, entityName, `${providerName}Provider.php`)
+    const queryFilePath = path.join(messagePath, 'Query', entityName, `${queryName}.php`)
+    const queryHandlerFilePath = path.join(messagePath, 'Query', entityName, `${queryName}Handler.php`)
+
+    // ! PROVIDER
     await createAndOpenPhpFile(providerFilePath, `
 use ApiPlatform\\Metadata\\Operation;
-use App\\ApiResource\\State\\AbstractStateProvider;
+use ${pathToUse(path.join(statePath, 'AbstractStateProvider'))};
 use App\\Entity\\User;
-use App\\Query\\${entityName}\\${queryName};
+use ${pathToUse(queryFilePath)};
 use App\\Entity\\${entityName};
 
 /**
@@ -70,10 +75,7 @@ final class ${providerName}Provider extends AbstractStateProvider
     }
 }`)
 
-    const messagePath = await getMessagePath(folderPath)
-
     // ! QUERY
-    const queryFilePath = path.join(messagePath, 'Query', entityName, `${queryName}.php`)
     await createAndOpenPhpFile(queryFilePath, `
 use App\\Entity\\User;
 
@@ -87,7 +89,6 @@ final readonly class ${queryName}
 `)
 
     // ! QUERY HANDLER
-    const queryHandlerFilePath = path.join(messagePath, 'Query', entityName, `${queryName}Handler.php`)
     await createAndOpenPhpFile(queryHandlerFilePath, `
 use App\\Repository\\${entityName}Repository;
 use Doctrine\\ORM\\QueryBuilder;

@@ -3,6 +3,7 @@ import * as path from 'node:path'
 import * as vscode from 'vscode'
 import { createAndOpenPhpFile, getMessagePath, getStatePath } from '../utils/file'
 import input from '../utils/input'
+import { pathToUse } from '../utils/textUtils'
 
 export default <KCommand>{
   callback: async () => {
@@ -38,14 +39,19 @@ export default <KCommand>{
     const commandName = `Process${processorName}Command`
 
     const statePath = await getStatePath(folderPath)
+    const messagePath = await getMessagePath(folderPath)
+
+    const processorPath = path.join(statePath, entityName, `${processorName}Processor.php`)
+    const commandPath = path.join(messagePath, 'Command', entityName, `${commandName}.php`)
+    const commandHandlerPath = path.join(messagePath, 'Command', entityName, `${commandName}Handler.php`)
 
     // ! PROCESSOR
-    await createAndOpenPhpFile(path.join(statePath, entityName, `${processorName}Processor.php`), `
+    await createAndOpenPhpFile(processorPath, `
 use ApiPlatform\\Metadata\\Operation;
-use App\\ApiResource\\State\\AbstractStateProcessor;
+use ${pathToUse(path.join(statePath, 'AbstractStateProcessor'))};
 use App\\Entity\\User;
 use App\\Entity\\${entityName};
-use App\\Command\\${entityName}\\${commandName};
+use ${pathToUse(commandPath)};
 
 /**
  * @extends AbstractStateProcessor<${entityName}, ${entityName}>
@@ -64,10 +70,8 @@ final class ${processorName}Processor extends AbstractStateProcessor
 }
 `)
 
-    const messagePath = await getMessagePath(folderPath)
-
     // ! COMMAND
-    await createAndOpenPhpFile(path.join(messagePath, 'Command', entityName, `${commandName}.php`), `
+    await createAndOpenPhpFile(commandPath, `
 use App\\Entity\\${entityName};
 
 final readonly class ${commandName}
@@ -81,7 +85,7 @@ final readonly class ${commandName}
 `)
 
     // ! COMMAND HANDLER
-    await createAndOpenPhpFile(path.join(messagePath, 'Command', entityName, `${commandName}Handler.php`), `
+    await createAndOpenPhpFile(commandHandlerPath, `
 use App\\Entity\\${entityName};
 use Symfony\\Component\\Messenger\\Attribute\\AsMessageHandler;
 

@@ -29,3 +29,25 @@ export function pathToNamespace(path: string): string {
 
   return paths.join('\\')
 }
+
+export function pathToUse(path: string): string {
+  // get src/ position, and cut the string from there
+  const srcIndex = path.indexOf('src/')
+  if (srcIndex !== -1) {
+    path = path.slice(srcIndex + 4)
+  }
+
+  // trim "/" and "\" from left/right
+  path = path.replace(/^[/\\]+|[/\\]+$/g, '')
+
+  const paths = path.split('/').map(firstUpper)
+
+  // remove extension
+  paths[paths.length - 1] = paths[paths.length - 1].split('.')[0]
+
+  // if first element != App, add App to the beginning
+  if (paths[0] !== 'App')
+    paths.unshift('App')
+
+  return paths.join('\\')
+}

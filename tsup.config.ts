@@ -11,4 +11,5 @@ export default defineConfig({
   splitting: false,
   clean: true,
   dts: false,
+  outDir: 'out',
 })

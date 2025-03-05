@@ -3,6 +3,7 @@ package:
 	vsce package
 
 install:
-	code --install-extension *.vsix
+	code --uninstall-extension kaynooo.ksymfony
+	code --install-extension *.vsix --force
 
 package-install: package install
