@@ -30,6 +30,10 @@
       {
         "command": "ksymfony.provider",
         "title": "KSymfony: Provider"
+      },
+      {
+        "command": "ksymfony.repository",
+        "title": "KSymfony: Repository"
       }
     ]
   },

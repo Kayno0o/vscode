@@ -1,5 +1,5 @@
-import * as path from 'node:path'
-import * as vscode from 'vscode'
+import path from 'node:path'
+import vscode from 'vscode'
 import { pathToNamespace } from './textUtils'
 
 export async function createAndOpenFile(filePath: string, content: string): Promise<void> {
@@ -54,4 +54,8 @@ export async function getMessagePath(folderPath: string) {
     messagesPath = path.join(folderPath, 'src')
 
   return messagesPath
+}
+
+export function getRepositoryPath(folderPath: string) {
+  return path.join(folderPath, 'src', 'Repository')
 }

@@ -1,6 +1,6 @@
 import type { KCommand } from '../types'
-import * as path from 'node:path'
-import * as vscode from 'vscode'
+import path from 'node:path'
+import vscode from 'vscode'
 import { createAndOpenPhpFile, getMessagePath, getStatePath } from '../utils/file'
 import input from '../utils/input'
 import { firstLower, pathToUse } from '../utils/textUtils'
