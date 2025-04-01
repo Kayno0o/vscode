@@ -35,7 +35,16 @@
         "command": "ksymfony.repository",
         "title": "KSymfony: Repository"
       }
-    ]
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "ksymfony.repository",
+          "when": "explorerResourceIsFolder && resourcePath =~ /[\\/]src[\\/]Repository$/",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "nr compile",
