@@ -5,6 +5,7 @@ export default defineConfig({
   format: ['cjs'],
   target: 'node16',
   external: ['vscode'],
+  noExternal: ['@kaynooo/utils'],
   minify: true,
   sourcemap: false,
   bundle: true,

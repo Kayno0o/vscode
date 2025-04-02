@@ -51,12 +51,3 @@ export function pathToUse(path: string): string {
 
   return paths.join('\\')
 }
-
-export function toKebabCase(str: string): string {
-  return str
-    .replace(/([a-z])([A-Z])/g, '$1-$2')
-    .replace(/[\s_]+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '')
-    .toLowerCase()
-}

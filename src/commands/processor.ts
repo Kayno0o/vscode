@@ -1,5 +1,6 @@
 import type { KCommand } from '../types'
 import path from 'node:path'
+import { toPascalCase } from '@kaynooo/utils'
 import vscode from 'vscode'
 import { createAndOpenPhpFile, getMessagePath, getStatePath } from '../utils/file'
 import input from '../utils/input'
@@ -31,8 +32,10 @@ export default <KCommand>{
     }
 
     let { entityName, processorName } = result
+    entityName = toPascalCase(entityName)
 
     processorName = processorName.replace(/Processor$/, '')
+    processorName = toPascalCase(processorName)
 
     const folderPath = workspaceFolders[0].uri.fsPath
 
