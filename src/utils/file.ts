@@ -59,3 +59,7 @@ export async function getMessagePath(folderPath: string) {
 export function getRepositoryPath(folderPath: string) {
   return path.join(folderPath, 'src', 'Repository')
 }
+
+export function getEntityPath(folderPath: string) {
+  return path.join(folderPath, 'src', 'Entity')
+}

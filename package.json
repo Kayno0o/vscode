@@ -18,7 +18,7 @@
   ],
   "main": "./out/extension.js",
   "engines": {
-    "vscode": "^1.97.0"
+    "vscode": "^1.98.0"
   },
   "activationEvents": [],
   "contributes": {
@@ -34,6 +34,10 @@
       {
         "command": "ksymfony.repository",
         "title": "KSymfony: Repository"
+      },
+      {
+        "command": "ksymfony.entity",
+        "title": "KSymfony: Entity"
       }
     ],
     "menus": {
