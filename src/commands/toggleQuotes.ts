@@ -1,6 +1,8 @@
 import type { KCommand } from '../types'
 import vscode from 'vscode'
 
+interface QuotedRange { start: number, end: number }
+
 export default <KCommand>{
   name: 'toggleQuotes',
   callback: () => {
@@ -9,44 +11,43 @@ export default <KCommand>{
       return
 
     const doc = editor.document
-    const text = doc.getText()
-
+    const seenRanges = new Set<string>()
     const edits: { range: vscode.Range, newText: string }[] = []
 
     for (const selection of editor.selections) {
-      const cursorPos = selection.active
-      const offset = doc.offsetAt(cursorPos)
+      const startLine = selection.start.line
 
-      const start = findNearestQuote(text, offset, -1)
-      const end = findNearestQuote(text, offset, 1)
+      const line = doc.lineAt(startLine).text
+      const ranges = findQuotedStrings(line)
 
-      if (start === -1 || end === -1 || start >= end)
-        continue
+      for (const range of ranges) {
+        const rangeKey = `${startLine}:${range.start}-${range.end}`
+        if (!seenRanges.has(rangeKey)) {
+          seenRanges.add(rangeKey)
+          const startPos = new vscode.Position(startLine, range.start)
+          const endPos = new vscode.Position(startLine, range.end + 1)
+          const rangeToEdit = new vscode.Range(startPos, endPos)
 
-      const startChar = text[start]
-      const endChar = text[end]
-      const innerText = text.slice(start + 1, end)
-      const startPos = doc.positionAt(start)
-      const endPos = doc.positionAt(end)
+          const quotedText = line.slice(range.start + 1, range.end)
+          const currentQuote = line[range.start]
 
-      if (startChar === '\'' && endChar === '\'') {
-        const escaped = innerText.replace(/"/g, '\\"')
-        edits.push({
-          range: new vscode.Range(startPos, endPos.translate(0, 1)),
-          newText: `"${escaped}"`,
-        })
-      }
-      else if (startChar === '"' && endChar === '"') {
-        const unescaped = innerText.replace(/\\"/g, '"')
-        edits.push({
-          range: new vscode.Range(startPos, endPos.translate(0, 1)),
-          newText: `'${unescaped}'`,
-        })
+          let newText: string
+          if (currentQuote === '"') {
+            const raw = quotedText.replace(/\\"/g, '"')
+            newText = `'${raw.replace(/'/g, '\\\'')}'`
+          }
+          else {
+            const raw = quotedText.replace(/\\'/g, '\'')
+            newText = `"${raw.replace(/"/g, '\\"')}"`
+          }
+
+          edits.push({ range: rangeToEdit, newText })
+        }
       }
     }
 
     if (edits.length === 0) {
-      vscode.window.showInformationMessage('No matching quotes found.')
+      vscode.window.showInformationMessage('No toggleable quotes found.')
       return
     }
 
@@ -58,15 +59,47 @@ export default <KCommand>{
   },
 }
 
-function findNearestQuote(text: string, offset: number, direction: 1 | -1): number {
-  let i = offset + direction
-  while (i >= 0 && i < text.length) {
-    const char = text[i]
-    if (char === '"' || char === '\'')
-      return i
-    if (char === '\n')
-      break
-    i += direction
+export function findQuotedStrings(line: string): QuotedRange[] {
+  const ranges: QuotedRange[] = []
+  const length = line.length
+  let i = 0
+
+  while (i < length) {
+    const char = line[i]
+
+    if (char !== '"' && char !== '\'') {
+      i++
+      continue
+    }
+
+    const quote = char
+    const start = i++
+    let escaped = false
+
+    while (i < length) {
+      const current = line[i]
+
+      if (escaped) {
+        escaped = false
+      }
+      else if (current === '\\') {
+        escaped = true
+      }
+      else if (current === quote) {
+        break
+      }
+
+      i++
+    }
+
+    if (i < length && line[i] === quote) {
+      ranges.push({ start, end: i })
+      i++
+      continue
+    }
+
+    i = start + 1
   }
-  return -1
+
+  return ranges
 }
