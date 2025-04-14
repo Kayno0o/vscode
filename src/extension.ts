@@ -7,8 +7,8 @@ export function activate(context: vscode.ExtensionContext) {
   console.log('KSymfony extension is now active!')
 
   for (const command of commands) {
-    context.subscriptions.push(vscode.commands.registerCommand(`ksymfony.${command.name}`, command.callback))
-    outputChannel.appendLine(`Command registered: ksymfony.${command.name}`)
-    console.log(`Command registered: ksymfony.${command.name}`)
+    context.subscriptions.push(vscode.commands.registerCommand(`kvsc.${command.name}`, command.callback))
+    outputChannel.appendLine(`Command registered: kvsc.${command.name}`)
+    console.log(`Command registered: kvsc.${command.name}`)
   }
 }

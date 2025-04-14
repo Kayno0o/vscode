@@ -1,7 +1,7 @@
 {
-  "publisher": "kaynooo",
-  "name": "ksymfony",
-  "displayName": "KSymfony",
+  "publisher": "kayno0o",
+  "name": "kvsc",
+  "displayName": "KVSCode",
   "version": "0.0.1",
   "description": "Extension to create query, provider, etc. for Symfony projects",
   "author": {
@@ -11,7 +11,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kayno0o/ksymfony"
+    "url": "https://github.com/kayno0o/vscode"
   },
   "categories": [
     "Other"
@@ -24,30 +24,30 @@
   "contributes": {
     "commands": [
       {
-        "command": "ksymfony.processor",
-        "title": "KSymfony: Processor"
+        "command": "kvsc.processor",
+        "title": "KVSC: Processor"
       },
       {
-        "command": "ksymfony.provider",
-        "title": "KSymfony: Provider"
+        "command": "kvsc.provider",
+        "title": "KVSC: Provider"
       },
       {
-        "command": "ksymfony.repository",
-        "title": "KSymfony: Repository"
+        "command": "kvsc.repository",
+        "title": "KVSC: Repository"
       },
       {
-        "command": "ksymfony.entity",
-        "title": "KSymfony: Entity"
+        "command": "kvsc.entity",
+        "title": "KVSC: Entity"
       },
       {
-        "command": "ksymfony.toggleQuotes",
-        "title": "KSymfony: Single to Double Quote"
+        "command": "kvsc.toggleQuotes",
+        "title": "KVSC: Single to Double Quote"
       }
     ],
     "menus": {
       "explorer/context": [
         {
-          "command": "ksymfony.repository",
+          "command": "kvsc.repository",
           "when": "explorerResourceIsFolder && resourcePath =~ /[\\/]src[\\/]Repository$/",
           "group": "navigation"
         }
@@ -56,7 +56,7 @@
     "keybindings": [
       {
         "key": "ctrl+alt+'",
-        "command": "ksymfony.toggleQuotes",
+        "command": "kvsc.toggleQuotes",
         "when": "editorTextFocus"
       }
     ]
