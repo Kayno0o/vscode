@@ -1,6 +1,6 @@
 import type { KCommand } from '../types'
 import path from 'node:path'
-import { toKebabCase, toPascalCase } from '@kaynooo/utils'
+import { toKebab, toPascal } from '@kaynooo/utils'
 import vscode from 'vscode'
 import { createAndOpenPhpFile, getEntityPath } from '../utils/file'
 import input from '../utils/input'
@@ -26,7 +26,7 @@ export default <KCommand>{
     }
 
     let { entityName } = result
-    entityName = toPascalCase(entityName)
+    entityName = toPascal(entityName)
 
     const folderPath = workspaceFolders[0].uri.fsPath
 
@@ -44,14 +44,14 @@ use Symfony\\Component\\Serializer\\Attribute\\Groups;
 #[ORM\\Entity]
 #[API\\ApiResource(
     operations: [],
-    normalizationContext: ['groups' => ['${toKebabCase(entityName)}:read']],
-    denormalizationContext: ['groups' => ['${toKebabCase(entityName)}:write']],
+    normalizationContext: ['groups' => ['${toKebab(entityName)}:read']],
+    denormalizationContext: ['groups' => ['${toKebab(entityName)}:write']],
 )]
 class ${entityName} implements IdentifiableInterface
 {
     use Identifiable;
 
-    #[Groups(['${toKebabCase(entityName)}:read', '${toKebabCase(entityName)}:write'])]
+    #[Groups(['${toKebab(entityName)}:read', '${toKebab(entityName)}:write'])]
     #[ORM\\Column(type: Types::TEXT, length: 1000)]
     private string $text;
 

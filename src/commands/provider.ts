@@ -1,6 +1,6 @@
 import type { KCommand } from '../types'
 import path from 'node:path'
-import { toPascalCase } from '@kaynooo/utils'
+import { toPascal } from '@kaynooo/utils'
 import vscode from 'vscode'
 import { createAndOpenPhpFile, getMessagePath, getStatePath } from '../utils/file'
 import input from '../utils/input'
@@ -39,10 +39,10 @@ export default <KCommand>{
     }
 
     let { entityName, isCollection, providerName } = result
-    entityName = toPascalCase(entityName)
+    entityName = toPascal(entityName)
 
     providerName = providerName.replace(isCollection ? /(?:Collection)?Provider$/ : /Provider$/, '')
-    providerName = toPascalCase(providerName)
+    providerName = toPascal(providerName)
 
     providerName += (isCollection ? 'Collection' : '')
     const queryName = `${providerName}Query`

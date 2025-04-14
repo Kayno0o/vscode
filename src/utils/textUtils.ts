@@ -1,9 +1,9 @@
 export function firstLower(str: string): string {
-  return str.charAt(0).toLowerCase() + str.slice(1)
+  return str.charAt(0).toLower() + str.slice(1)
 }
 
 export function firstUpper(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1)
+  return str.charAt(0).toUpper() + str.slice(1)
 }
 
 export function pathToNamespace(path: string): string {
