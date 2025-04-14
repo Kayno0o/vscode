@@ -50,6 +50,21 @@
           "command": "kvsc.repository",
           "when": "explorerResourceIsFolder && resourcePath =~ /[\\/]src[\\/]Repository$/",
           "group": "navigation"
+        },
+        {
+          "command": "kvsc.entity",
+          "when": "explorerResourceIsFolder && resourcePath =~ /[\\/]src[\\/]Entity$/",
+          "group": "navigation"
+        },
+        {
+          "command": "kvsc.provider",
+          "when": "explorerResourceIsFolder && resourcePath =~ /[\\/]src[\\/]State$/",
+          "group": "navigation"
+        },
+        {
+          "command": "kvsc.processor",
+          "when": "explorerResourceIsFolder && resourcePath =~ /[\\/]src[\\/]State$/",
+          "group": "navigation"
         }
       ]
     },
