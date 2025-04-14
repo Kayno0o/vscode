@@ -38,6 +38,10 @@
       {
         "command": "ksymfony.entity",
         "title": "KSymfony: Entity"
+      },
+      {
+        "command": "ksymfony.toggleQuotes",
+        "title": "KSymfony: Single to Double Quote"
       }
     ],
     "menus": {
@@ -48,7 +52,14 @@
           "group": "navigation"
         }
       ]
-    }
+    },
+    "keybindings": [
+      {
+        "key": "ctrl+alt+'",
+        "command": "ksymfony.toggleQuotes",
+        "when": "editorTextFocus"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "nr compile",
