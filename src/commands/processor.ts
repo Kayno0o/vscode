@@ -52,7 +52,6 @@ export default <KCommand>{
     await createAndOpenPhpFile(processorPath, `
 use ApiPlatform\\Metadata\\Operation;
 use ${pathToUse(path.join(statePath, 'AbstractStateProcessor'))};
-use App\\Entity\\User;
 use App\\Entity\\${entityName};
 use ${pathToUse(commandPath)};
 
