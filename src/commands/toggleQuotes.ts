@@ -16,33 +16,38 @@ export default <KCommand>{
 
     for (const selection of editor.selections) {
       const startLine = selection.start.line
+      const cursorChar = selection.start.character
 
       const line = doc.lineAt(startLine).text
       const ranges = findQuotedStrings(line)
 
       for (const range of ranges) {
+        if (cursorChar < range.start || cursorChar > range.end)
+          continue
+
         const rangeKey = `${startLine}:${range.start}-${range.end}`
-        if (!seenRanges.has(rangeKey)) {
-          seenRanges.add(rangeKey)
-          const startPos = new vscode.Position(startLine, range.start)
-          const endPos = new vscode.Position(startLine, range.end + 1)
-          const rangeToEdit = new vscode.Range(startPos, endPos)
+        if (seenRanges.has(rangeKey))
+          continue
 
-          const quotedText = line.slice(range.start + 1, range.end)
-          const currentQuote = line[range.start]
+        seenRanges.add(rangeKey)
+        const startPos = new vscode.Position(startLine, range.start)
+        const endPos = new vscode.Position(startLine, range.end + 1)
+        const rangeToEdit = new vscode.Range(startPos, endPos)
 
-          let newText: string
-          if (currentQuote === '"') {
-            const raw = quotedText.replace(/\\"/g, '"')
-            newText = `'${raw.replace(/'/g, '\\\'')}'`
-          }
-          else {
-            const raw = quotedText.replace(/\\'/g, '\'')
-            newText = `"${raw.replace(/"/g, '\\"')}"`
-          }
+        const quotedText = line.slice(range.start + 1, range.end)
+        const currentQuote = line[range.start]
 
-          edits.push({ range: rangeToEdit, newText })
+        let newText: string
+        if (currentQuote === '"') {
+          const raw = quotedText.replace(/\\"/g, '"')
+          newText = `'${raw.replace(/'/g, '\\\'')}'`
         }
+        else {
+          const raw = quotedText.replace(/\\'/g, '\'')
+          newText = `"${raw.replace(/"/g, '\\"')}"`
+        }
+
+        edits.push({ range: rangeToEdit, newText })
       }
     }
 
