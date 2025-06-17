@@ -1,8 +1,6 @@
 import type { KCommand } from '../types'
 import vscode from 'vscode'
 
-interface QuotedRange { start: number, end: number }
-
 export default <KCommand>{
   name: 'toggleQuotes',
   callback: () => {
@@ -10,45 +8,31 @@ export default <KCommand>{
     if (!editor)
       return
 
-    const doc = editor.document
-    const seenRanges = new Set<string>()
-    const edits: { range: vscode.Range, newText: string }[] = []
+    const edits: vscode.TextEdit[] = []
+    const seen = new Set<string>()
 
     for (const selection of editor.selections) {
-      const startLine = selection.start.line
-      const cursorChar = selection.start.character
+      const line = editor.document.lineAt(selection.start.line)
+      const pos = selection.start.character
 
-      const line = doc.lineAt(startLine).text
-      const ranges = findQuotedStrings(line)
+      // find quote at cursor position
+      const match = findQuoteAtPosition(line.text, pos)
+      if (!match)
+        continue
 
-      for (const range of ranges) {
-        if (cursorChar < range.start || cursorChar > range.end)
-          continue
+      const key = `${line.lineNumber}:${match.start}-${match.end}`
+      if (seen.has(key))
+        continue
+      seen.add(key)
 
-        const rangeKey = `${startLine}:${range.start}-${range.end}`
-        if (seenRanges.has(rangeKey))
-          continue
+      const range = new vscode.Range(
+        line.lineNumber,
+        match.start,
+        line.lineNumber,
+        match.end,
+      )
 
-        seenRanges.add(rangeKey)
-        const startPos = new vscode.Position(startLine, range.start)
-        const endPos = new vscode.Position(startLine, range.end + 1)
-        const rangeToEdit = new vscode.Range(startPos, endPos)
-
-        const quotedText = line.slice(range.start + 1, range.end)
-        const currentQuote = line[range.start]
-
-        let newText: string
-        if (currentQuote === '"') {
-          const raw = quotedText.replace(/\\"/g, '"')
-          newText = `'${raw.replace(/'/g, '\\\'')}'`
-        }
-        else {
-          const raw = quotedText.replace(/\\'/g, '\'')
-          newText = `"${raw.replace(/"/g, '\\"')}"`
-        }
-
-        edits.push({ range: rangeToEdit, newText })
-      }
+      edits.push(vscode.TextEdit.replace(range, toggleQuote(match.content)))
     }
 
     if (edits.length === 0) {
@@ -56,55 +40,48 @@ export default <KCommand>{
       return
     }
 
-    editor.edit((editBuilder) => {
-      for (const { range, newText } of edits) {
-        editBuilder.replace(range, newText)
-      }
+    editor.edit((edit) => {
+      for (const e of edits) edit.replace(e.range, e.newText)
     })
   },
 }
 
-export function findQuotedStrings(line: string): QuotedRange[] {
-  const ranges: QuotedRange[] = []
-  const length = line.length
+function findQuoteAtPosition(line: string, pos: number) {
   let i = 0
 
-  while (i < length) {
-    const char = line[i]
-
-    if (char !== '"' && char !== '\'') {
+  while (i < line.length) {
+    if (line[i] !== '"' && line[i] !== '\'') {
       i++
       continue
     }
 
-    const quote = char
+    const quote = line[i]
     const start = i++
-    let escaped = false
 
-    while (i < length) {
-      const current = line[i]
-
-      if (escaped) {
-        escaped = false
-      }
-      else if (current === '\\') {
-        escaped = true
-      }
-      else if (current === quote) {
-        break
-      }
-
+    while (i < line.length && (line[i] !== quote || line[i - 1] === '\\')) {
       i++
     }
 
-    if (i < length && line[i] === quote) {
-      ranges.push({ start, end: i })
-      i++
-      continue
+    if (i < line.length && pos >= start && pos <= i) {
+      return {
+        start,
+        end: i + 1,
+        content: line.slice(start, i + 1),
+      }
     }
 
-    i = start + 1
+    i++
   }
 
-  return ranges
+  return null
+}
+
+function toggleQuote(quoted: string) {
+  const quote = quoted[0]
+  const content = quoted.slice(1, -1)
+
+  if (quote === '"')
+    return `'${content.replace(/\\"/g, '"').replace(/'/g, '\\\'')}'`
+
+  return `"${content.replace(/\\'/g, '\'').replace(/"/g, '\\"')}"`
 }

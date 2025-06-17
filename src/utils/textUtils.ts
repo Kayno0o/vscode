@@ -14,7 +14,7 @@ export function pathToNamespace(path: string): string {
   }
 
   // trim "/" and "\" from left/right
-  path = path.replace(/^[/\\]+|[/\\]+$/g, '')
+  path = path.replace(/(^[/\\]+)|([/\\]+$)/g, '')
 
   const paths = path.split('/').map(firstUpper)
 
@@ -38,7 +38,7 @@ export function pathToUse(path: string): string {
   }
 
   // trim "/" and "\" from left/right
-  path = path.replace(/^[/\\]+|[/\\]+$/g, '')
+  path = path.replace(/(^[/\\]+)|([/\\]+$)/g, '')
 
   const paths = path.split('/').map(firstUpper)
 
