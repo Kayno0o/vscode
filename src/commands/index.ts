@@ -1,4 +1,5 @@
 import entity from './entity'
+import getterSetter from './getterSetter'
 import processor from './processor'
 import provider from './provider'
 import repository from './repository'
@@ -10,4 +11,5 @@ export default [
   repository,
   entity,
   toggleQuotes,
+  getterSetter,
 ]

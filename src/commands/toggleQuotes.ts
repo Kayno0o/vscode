@@ -25,12 +25,7 @@ export default <KCommand>{
         continue
       seen.add(key)
 
-      const range = new vscode.Range(
-        line.lineNumber,
-        match.start,
-        line.lineNumber,
-        match.end,
-      )
+      const range = new vscode.Range(line.lineNumber, match.start, line.lineNumber, match.end)
 
       edits.push(vscode.TextEdit.replace(range, toggleQuote(match.content)))
     }
