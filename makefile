@@ -1,6 +1,8 @@
 package:
 	rm -f *.vsix
+	bun run check
 	vsce package
+	cp kvsc*.vsix ~/zshrc/dotfiles/vscode/extensions
 
 install:
 	-code --uninstall-extension kaynooo.kvsc
