@@ -18,7 +18,7 @@
   ],
   "main": "./out/extension.js",
   "engines": {
-    "vscode": "^1.99.1"
+    "vscode": "^1.102.0"
   },
   "activationEvents": [],
   "contributes": {
@@ -42,6 +42,10 @@
       {
         "command": "kvsc.toggleQuotes",
         "title": "KVSC: Single to Double Quote"
+      },
+      {
+        "command": "kvsc.getterSetter",
+        "title": "KVSC: Generate Getter/Setter"
       }
     ],
     "menus": {
@@ -80,23 +84,22 @@
     "vscode:prepublish": "nr compile",
     "compile": "bun x tsup",
     "pretest": "nr compile && nr lint",
-    "lint": "eslint src --ext ts",
+    "lint": "bunx eslint src --ext ts",
     "test": "vscode-test",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "bunx eslint . --fix",
+    "check": "tsc --noEmit --strict"
   },
   "dependencies": {
-    "@kaynooo/utils": "^1.2.17"
+    "@kaynooo/utils": "^1.3.4"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^4.14.1",
-    "@kaynooo/eslint": "^1.1.7",
+    "@kaynooo/eslint": "^1.1.13",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^24.0.3",
-    "@types/vscode": "^1.101.0",
+    "@types/node": "^24.2.0",
+    "@types/vscode": "^1.102.0",
     "@vscode/test-cli": "^0.0.11",
     "@vscode/test-electron": "^2.5.2",
-    "eslint": "^9.29.0",
-    "eslint-plugin-github": "^6.0.0",
+    "eslint": "^9.32.0",
     "tsup": "^8.5.0",
     "vscode": "^1.1.37"
   }
