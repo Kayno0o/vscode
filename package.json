@@ -20,7 +20,9 @@
   "engines": {
     "vscode": "^1.102.0"
   },
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:php"
+  ],
   "contributes": {
     "commands": [
       {

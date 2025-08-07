@@ -1,4 +1,4 @@
 export interface KCommand {
-  callback: () => Promise<void> | void
+  callback: (...args: any[]) => Promise<void> | void
   name: string
 }
