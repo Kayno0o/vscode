@@ -52,7 +52,7 @@ export default <KCommand>{
       return
     }
 
-    // Prompt user to select a property
+    // Prompt user to select properties (with multi-select)
     const propertyItems = propertiesWithoutGetterSetter.map(prop => ({
       label: prop.name,
       description: `${prop.isNullable ? '?' : ''}${prop.type}`,
@@ -60,19 +60,24 @@ export default <KCommand>{
       property: prop,
     }))
 
-    const selectedItem = await vscode.window.showQuickPick(propertyItems, {
-      placeHolder: 'Select a property to generate getter/setter for',
+    const selectedItems = await vscode.window.showQuickPick(propertyItems, {
+      placeHolder: 'Select properties to generate getter/setter for (use Ctrl/Cmd to select multiple)',
+      canPickMany: true,
     })
 
-    if (!selectedItem) {
+    if (!selectedItems || selectedItems.length === 0) {
       return
     }
 
-    const selectedProperty = selectedItem.property
+    const selectedProperties = selectedItems.map(item => item.property)
 
-    // Generate getter and setter methods
-    const getterMethod = generateGetter(selectedProperty)
-    const setterMethod = generateSetter(selectedProperty)
+    // Generate all methods
+    const allMethods: string[] = []
+    for (const property of selectedProperties) {
+      const getterMethod = generateGetter(property)
+      const setterMethod = generateSetter(property)
+      allMethods.push(getterMethod, setterMethod)
+    }
 
     // Find the end position to insert methods
     const classEndPosition = findClassEndPosition(text)
@@ -101,7 +106,7 @@ export default <KCommand>{
         methodsToInsert += '\n'
       }
 
-      methodsToInsert += `\n${getterMethod}\n\n${setterMethod}`
+      methodsToInsert += `\n${allMethods.join('\n\n')}`
 
       if (needsTrailingNewline) {
         methodsToInsert += '\n'
@@ -112,7 +117,8 @@ export default <KCommand>{
 
     await document.save()
 
-    vscode.window.showInformationMessage(`Generated getter and setter for property: ${selectedProperty.name}`)
+    const propertyNames = selectedProperties.map(p => p.name).join(', ')
+    vscode.window.showInformationMessage(`Generated getters and setters for properties: ${propertyNames}`)
   },
 }
 
